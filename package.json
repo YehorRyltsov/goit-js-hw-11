@@ -15,7 +15,7 @@
   "author": "Yehor Ryltsov <yehor.ryltsov@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/goitacademy/parcel-project-template/issues"
+    "url": "https://github.com/YehorRyltsov/goit-js-hw-11"
   },
   "dependencies": {
     "axios": "^0.27.2",
