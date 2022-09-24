@@ -5,7 +5,7 @@
   "homepage": "https://yehorryltsov.github.io/goit-js-hw-11/",
   "scripts": {
     "start": "parcel src/*.html",
-    "build": "parcel build src/*.html --public-url /goit-js-hw-11/"
+    "build": "parcel build src/*.html --public-url /goit-js-hw-11"
   },
   "repository": {
     "type": "git",
@@ -15,7 +15,7 @@
   "author": "Yehor Ryltsov <yehor.ryltsov@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/YehorRyltsov/goit-js-hw-11"
+    "url": "https://github.com/goitacademy/parcel-project-template/issues"
   },
   "dependencies": {
     "axios": "^0.27.2",
