@@ -1,23 +1,19 @@
-import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import API from './fetchimages';
+const simplelightbox = new SimpleLightbox('.gallery a');
 
 const galleryContainer = document.querySelector('.gallery');
-
-// axios.get('/users').then(res => {
-//   console.log(res.data);
-// });
 const button = document.querySelector('.load-more');
 const refs = document.querySelector('#search-form');
-
+let totalInfo = 0;
 let page = 1;
 let total = 0;
 let name = '';
 let curentTotal = 0;
-refs.addEventListener('submit', fetchImages);
 
+refs.addEventListener('submit', fetchImages);
 button.addEventListener('click', fetchImages);
 
 function fetchImages(e) {
@@ -28,42 +24,54 @@ function fetchImages(e) {
     name = e.target.elements['searchQuery'].value;
     name = name.trim();
     page = 1;
-  } else {
-    page = page + 1;
-    curentTotal = 40 * page;
-    //   countryList.innerHTML = '';
   }
 
   if (name.length !== 0) {
-    API.ffol(name, page)
-      .then(renderImages)
-      .then(function ({ photoCard, galleryItems }) {
-        galleryContainer.insertAdjacentHTML('beforeend', photoCard);
-        new SimpleLightbox('.gallery a');
-        total = galleryItems.totalHits;
-        let totalInfo = total - curentTotal;
-        if (total === 0) {
-          return Notify.failure('Oops, there is no images with that name');
-        } else if (total - curentTotal > 0) {
-          button.classList.remove('hide');
-          return Notify.info(`${totalInfo}
-                "Hooray! We found totalHits images."`);
-        } else {
-          button.classList.add('hide');
-          return Notify.info(
-            "We're sorry, but you've reached the end of search results."
-          );
-        }
-      })
+    API.getImages(name, page)
+      .then(photoCard)
       .catch(error => {
         Notify.failure('Oops, there is no images with that name');
         console.log(error);
       });
   }
 }
+function photoCard(galleryItems) {
+  total = galleryItems.totalHits;
+
+  if (total === 0) {
+    return Notify.failure('Oops, !!!there is no images with that name');
+  } else if (total > 0) {
+    if (total <= 40) {
+      curentTotal = total;
+    } else if (curentTotal === 0) {
+      curentTotal = 40;
+      page = page + 1;
+      button.classList.remove('hide');
+    } else if (totalInfo < 40 && totalInfo > 0) {
+      curentTotal = total;
+      button.classList.add('hide');
+    } else {
+      curentTotal = page * 40;
+      page = page + 1;
+      button.classList.remove('hide');
+    }
+    totalInfo = total - curentTotal;
+    let photoCards = renderImages(galleryItems);
+    galleryContainer.insertAdjacentHTML('beforeend', photoCards);
+    simplelightbox.refresh();
+
+    return Notify.info(`${totalInfo}
+                "Hooray! We found ${total} images."`);
+  } else {
+    button.classList.add('hide');
+    return Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+  }
+}
 
 function renderImages(galleryItems) {
-  let photoCard = galleryItems.hits
+  return galleryItems.hits
     .map(hit => {
       return `<div class="photo-card">
   <a href="${hit.largeImageURL}">
@@ -86,5 +94,4 @@ function renderImages(galleryItems) {
 </div>`;
     })
     .join(' ');
-  return { photoCard, galleryItems };
 }
